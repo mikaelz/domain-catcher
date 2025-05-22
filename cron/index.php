@@ -21,5 +21,4 @@ if (filter_var($_GET['domain'], FILTER_VALIDATE_DOMAIN)) {
 }
 if (!empty($domain) && $domainCatcher->isDomainAvailable($domain)) {
 	$domainCatcher->orderDomain($domain, $_ENV['DRY_RUN'] === 'true');
-	return;
 }
