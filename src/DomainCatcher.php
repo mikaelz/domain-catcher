@@ -8,7 +8,7 @@ use JsonException;
 
 class DomainCatcher
 {
-	private const string API_BASE = 'https://rest.websupport.sk/v1';
+	private const string API_BASE = 'https://rest.websupport.sk';
 
 	public function __construct(
 		private readonly string $apiKey,
@@ -52,7 +52,7 @@ class DomainCatcher
 	 */
 	public function isDomainAvailable(string $domain): bool
 	{
-		$response = $this->request('POST', '/order/sk/validate/domain', ['domain' => $domain]);
+		$response = $this->request('POST', '/v1/order/sk/validate/domain', ['domain' => $domain]);
 		$response = json_decode($response, true, 512, JSON_THROW_ON_ERROR);
 
 		return $response['errors'] === [];
@@ -68,7 +68,12 @@ class DomainCatcher
 				],
 			],
 		];
-		$response = $this->request('POST', sprintf('/user/%s/order', $this->userId), $data, '?dry_run=' . ($dryRun ? '1' : '0'));
+		$response = $this->request(
+			'POST',
+			sprintf('/v1/user/%s/order', $this->userId),
+			$data,
+			'?dry_run=' . ($dryRun ? '1' : '0'),
+		);
 		$response = json_decode($response, true, 512, JSON_THROW_ON_ERROR);
 
 		return $response['errors'] === [];
