@@ -15,10 +15,15 @@ $domainCatcher = new DomainCatcher(
 	$_ENV['WS_API_SECRET'],
 	(int)$_ENV['WS_USER_ID'],
 );
-$domain = '';
-if (filter_var($_GET['domain'], FILTER_VALIDATE_DOMAIN)) {
-	$domain = $_GET['domain'];
+$domains = [];
+foreach ($_GET['domains'] as $domain) {
+	if (filter_var($domain, FILTER_VALIDATE_DOMAIN) && $domainCatcher->isDomainAvailable($domain)) {
+		$domains[] = $domain;
+	}
 }
-if (!empty($domain) && $domainCatcher->isDomainAvailable($domain)) {
-	$domainCatcher->orderDomain($domain, $_ENV['DRY_RUN'] === 'true');
+
+if ($domains === []) {
+	exit('No available domains found.');
 }
+
+$domainCatcher->orderDomain($domains, $_ENV['DRY_RUN'] === 'true');

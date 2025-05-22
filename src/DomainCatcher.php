@@ -59,16 +59,15 @@ class DomainCatcher
 		return $response['errors'] === [];
 	}
 
-	public function orderDomain(string $domain, bool $dryRun = true): bool
+	public function orderDomain(array $domains, bool $dryRun = true): bool
 	{
-		$data = [
-			'services' => [
-				[
-					'type' => 'domain',
-					'domain' => $domain,
-				],
-			],
-		];
+		$data['services'] = [];
+		foreach ($domains as $domain) {
+			$data['services'][] = [
+				'type' => 'domain',
+				'domain' => $domain,
+			];
+		}
 		$response = $this->request(
 			'POST',
 			sprintf('/v1/user/%s/order', $this->userId),
@@ -76,16 +75,16 @@ class DomainCatcher
 			'?dry_run=' . ($dryRun ? '1' : '0'),
 		);
 		$response = json_decode($response, true, 512, JSON_THROW_ON_ERROR);
-		$this->log(sprintf('Order response for %s', $domain), $response['status'], $response);
+		$this->log(sprintf('Order response for %s', implode(', ', $domains)), $response['status'], $response);
 
 		return $response['errors'] === [];
 	}
 
-	protected function log(string $message, $status, array $context = []): void
+	protected function log(string $message, string $status, array $context = []): void
 	{
 		file_put_contents(
 			__DIR__ . '/../var/log/' . pathinfo(__FILE__, PATHINFO_FILENAME) . '.log',
-			sprintf('%s %s %s' . PHP_EOL, date('c'), $message, json_encode($context, JSON_THROW_ON_ERROR)),
+			sprintf('%s %s %s %s' . PHP_EOL, date('c'), $status, $message, json_encode($context, JSON_THROW_ON_ERROR)),
 			FILE_APPEND,
 		);
 	}
