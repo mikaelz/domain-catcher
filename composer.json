@@ -1,0 +1,19 @@
+{
+  "name": "websupport-sk/domain-catcher",
+  "type": "script",
+  "description": "Cron script to order domain via WebSupport API https://rest.websupport.sk/docs",
+  "keywords": ["cron", "script", "domain"],
+  "homepage": "https://github.com/websupport-sk/domain-catcher",
+  "license": "BSD-3-Clause",
+  "require": {
+    "php": "^8.3",
+    "symfony/dotenv": "^7.2"
+  }
+	,
+	"require-dev": {
+		"roave/security-advisories": "dev-latest"
+	},
+  "autoload": {
+    "psr-4": {"WebSupport\\": "src/"}
+  }
+}

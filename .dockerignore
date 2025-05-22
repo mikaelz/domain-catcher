@@ -1,0 +1,16 @@
+.gitignore
+tags
+*.diff
+*.err
+*.orig
+*.log
+*.rej
+*.swo
+*.swp
+*.vi
+*~
+._.*
+
+.git/
+.idea/
+cache/
