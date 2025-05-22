@@ -3,7 +3,6 @@
 declare(strict_types=1);
 
 use Symfony\Component\Dotenv\Dotenv;
-use WebSupport\Client;
 use WebSupport\DomainCatcher;
 
 require_once __DIR__ . '/../vendor/autoload.php';
@@ -11,15 +10,16 @@ require_once __DIR__ . '/../vendor/autoload.php';
 $dotenv = new Dotenv();
 $dotenv->load(__DIR__ . '/../.env');
 
-$client = new Client($_ENV['WS_API_KEY'], $_ENV['WS_API_SECRET']);
-$domainCatcher = new DomainCatcher($client);
+$domainCatcher = new DomainCatcher(
+	$_ENV['WS_API_KEY'],
+	$_ENV['WS_API_SECRET'],
+	(int)$_ENV['WS_USER_ID'],
+);
 $domain = '';
 if (filter_var($_GET['domain'], FILTER_VALIDATE_DOMAIN)) {
 	$domain = $_GET['domain'];
 }
 if (!empty($domain) && $domainCatcher->isDomainAvailable($domain)) {
-	// Order domain
+	$domainCatcher->orderDomain($domain, (bool)$_ENV['DRY_RUN']);
 	return;
 }
-
-// Domain is not available

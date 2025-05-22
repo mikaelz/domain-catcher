@@ -8,8 +8,43 @@ use JsonException;
 
 class DomainCatcher
 {
-	public function __construct(private readonly Client $client)
+	private const string API_BASE = 'https://rest.websupport.sk/v1';
+
+	public function __construct(
+		private readonly string $apiKey,
+		private readonly string $apiSecret,
+		private readonly int $userId,
+	)
 	{
+	}
+
+	protected function request(string $method, string $path, array $data = [], string $query = ''): bool|string
+	{
+		$time = time();
+		$canonicalRequest = sprintf('%s %s %s', $method, $path, $time);
+		$signature = hash_hmac('sha1', $canonicalRequest, $this->apiSecret);
+
+		$ch = curl_init();
+		curl_setopt($ch, CURLOPT_URL, sprintf('%s%s%s', self::API_BASE, $path, $query));
+		curl_setopt($ch, CURLOPT_CUSTOMREQUEST, $method);
+		curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+		curl_setopt($ch, CURLOPT_HTTPAUTH, CURLAUTH_BASIC);
+		curl_setopt($ch, CURLOPT_USERPWD, $this->apiKey . ':' . $signature);
+		curl_setopt($ch, CURLOPT_HTTPHEADER, [
+			'Content-Type: application/json',
+			'Date: ' . gmdate('Ymd\THis\Z', $time),
+		]);
+		if ($data !== []) {
+			curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($data, JSON_THROW_ON_ERROR));
+		}
+
+		$response = curl_exec($ch);
+		if (curl_errno($ch)) {
+			error_log(curl_error($ch));
+		}
+		curl_close($ch);
+
+		return $response;
 	}
 
 	/**
@@ -17,9 +52,25 @@ class DomainCatcher
 	 */
 	public function isDomainAvailable(string $domain): bool
 	{
-		$response = $this->client->request('POST', '/order/sk/validate/domain', ['domain' => $domain]);
-		$data = json_decode($response, true, 512, JSON_THROW_ON_ERROR);
+		$response = $this->request('POST', '/order/sk/validate/domain', ['domain' => $domain]);
+		$response = json_decode($response, true, 512, JSON_THROW_ON_ERROR);
 
-		return $data['errors'] === [];
+		return $response['errors'] === [];
+	}
+
+	public function orderDomain(string $domain, bool $dryRun = true): bool
+	{
+		$data = [
+			'services' => [
+				[
+					'type' => 'domain',
+					'domain' => $domain,
+				],
+			],
+		];
+		$response = $this->request('POST', sprintf('/user/%s/order', $this->userId), $data, '?dry_run=' . ($dryRun ? '1' : '0'));
+		$response = json_decode($response, true, 512, JSON_THROW_ON_ERROR);
+
+		return $response['errors'] === [];
 	}
 }
