@@ -2,6 +2,11 @@
 Order domain when it becomes available for registration via WebSupport API v1 https://rest.websupport.sk/docs/v1.intro
 
 # Installation
+1. Run `composer require websupport/domain-catcher`
+2. Copy `vendor/websupport-sk/domain-catcher/.env.example` to `.env`
+3. Update API `identifier`, `secret` and `user ID` in `.env` with your own from https://admin.websupport.sk/en/auth/security-settings
+
+# Development
 1. Run `composer install`
 2. Copy `.env.example` to `.env`
 3. Replace API identifier, secret and user ID in `.env` with your own from https://admin.websupport.sk/en/auth/security-settings

@@ -7,6 +7,7 @@
 		"script",
 		"domain"
 	],
+	"version": "1.0.0",
 	"homepage": "https://github.com/websupport-sk/domain-catcher",
 	"license": "BSD-3-Clause",
 	"require": {
