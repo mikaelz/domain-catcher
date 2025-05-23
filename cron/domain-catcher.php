@@ -22,8 +22,6 @@ foreach ($_GET['domains'] as $domain) {
 	}
 }
 
-if ($domains === []) {
-	exit('No available domains found.');
+if ($domains !== []) {
+	$domainCatcher->orderDomain($domains, $_ENV['DRY_RUN'] === 'true');
 }
-
-$domainCatcher->orderDomain($domains, $_ENV['DRY_RUN'] === 'true');
