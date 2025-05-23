@@ -83,7 +83,7 @@ class DomainCatcher
 	protected function log(string $message, string $status, array $context = []): void
 	{
 		file_put_contents(
-			__DIR__ . '/../var/log/' . pathinfo(__FILE__, PATHINFO_FILENAME) . '.log',
+			__DIR__ . '/../var/log/' . pathinfo($_SERVER['SCRIPT_NAME'], PATHINFO_FILENAME) . '.log',
 			sprintf('%s %s %s %s' . PHP_EOL, date('c'), $status, $message, json_encode($context, JSON_THROW_ON_ERROR)),
 			FILE_APPEND,
 		);
